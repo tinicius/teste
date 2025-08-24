@@ -64,8 +64,54 @@ export const PokemonModal = ({
 
         <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
           <Typography fontWeight={600}>Peso:</Typography>
+          <Typography fontWeight={600}>{`${
+            pokemonDetails.weight / 10
+          } kg`}</Typography>
         </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+          <Typography fontWeight={600}>Altura:</Typography>
+          <Typography fontWeight={600}>{`${
+            pokemonDetails.height / 10
+          } m`}</Typography>
+        </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+          <Typography fontWeight={600}>Espécie:</Typography>
+          <Typography
+            fontWeight={600}
+          >{`${pokemonDetails.species.name}`}</Typography>
+        </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+          <Typography fontWeight={600}>Habilidades:</Typography>
+          <Typography fontWeight={600}>{`${pokemonDetails.abilities
+            .map((ability) => ability.ability.name)
+            .join(", ")}`}</Typography>
+        </Box>
+
+        <PokemonGender />
+
+        <PokemonForms />
       </Box>
     </Modal>
+  );
+};
+
+const PokemonGender = () => {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+      <Typography fontWeight={600}>Gender:</Typography>
+      <Typography fontWeight={600}>{`12`}</Typography>
+    </Box>
+  );
+};
+
+const PokemonForms = () => {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+      <Typography fontWeight={600}>Forms:</Typography>
+      <Typography fontWeight={600}>{`12`}</Typography>
+    </Box>
   );
 };

@@ -7,7 +7,14 @@ export interface PokemonDetails {
   weight: number;
   height: number;
   category: string;
-  ability: string;
+  abilities: {
+    is_hidden: boolean;
+    slot: number;
+    ability: {
+      id: string;
+      name: string;
+    };
+  }[];
   types: [
     {
       slot: number;
@@ -17,4 +24,12 @@ export interface PokemonDetails {
       };
     }
   ];
+  species: {
+    name: string;
+    url: string;
+  };
+  forms: {
+    name: string;
+    url: string;
+  }[];
 }
