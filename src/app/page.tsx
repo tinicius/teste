@@ -83,16 +83,16 @@ export default function Home() {
             md: 16,
           }}
         >
-          {pokemons.map((pokemon) => (
+          {Array.from({ length: 10 }).map((_, index) => (
             <Grid
-              key={pokemon.id}
+              key={index}
               size={{
                 xs: 4,
                 sm: 4,
                 md: 4,
               }}
             >
-              <Skeleton variant="rectangular" width="100%" height={100} />
+              <Skeleton variant="rounded" width="100%" height={100} />
             </Grid>
           ))}
         </Grid>
