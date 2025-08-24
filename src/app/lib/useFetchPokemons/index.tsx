@@ -1,5 +1,5 @@
 import { Pokemon } from "@/app/entities";
-import { PokemonDetailsResponse, PokemonResponse } from "./entities";
+import { PokemonResponse } from "./entities";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useFetchPokemons = () => {
@@ -16,11 +16,10 @@ export const useFetchPokemons = () => {
   const getPokemonsByName = useCallback(
     async (name: string): Promise<Pokemon[]> => {
       try {
-        console.log(nameOffset.current);
         const maxLimit = 10000;
 
         const res = await fetch(
-          `https://pokeapi.co/api/v2/pokemon-species?offset=${nameOffset.current}&limit=${maxLimit}`
+          `https://pokeapi.co/api/v2/pokemon?offset=${nameOffset.current}&limit=${maxLimit}`
         );
 
         const json = (await res.json()) as PokemonResponse;
@@ -36,16 +35,7 @@ export const useFetchPokemons = () => {
             continue;
 
           try {
-            const details = (await (
-              await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
-            ).json()) as PokemonDetailsResponse;
-
-            pokemons.push({
-              id: details.id,
-              name: pokemon.name,
-              url: details.sprites.front_default,
-              types: details.types.map((type) => type.type.name),
-            });
+            pokemons.push(pokemon);
 
             if (pokemons.length >= 10) {
               countResult = index + 1;
@@ -74,33 +64,12 @@ export const useFetchPokemons = () => {
   const getPokemons = useCallback(async (): Promise<Pokemon[]> => {
     try {
       const res = await fetch(
-        `https://pokeapi.co/api/v2/pokemon-species?offset=${offset.current}&limit=${limit.current}`
+        `https://pokeapi.co/api/v2/pokemon?offset=${offset.current}&limit=${limit.current}`
       );
 
       const json = (await res.json()) as PokemonResponse;
 
-      const pokemons: Pokemon[] = [];
-
-      for (let index = 0; index < json.results.length; index++) {
-        const pokemon = json.results[index];
-
-        try {
-          const details = (await (
-            await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
-          ).json()) as PokemonDetailsResponse;
-
-          pokemons.push({
-            id: details.id,
-            name: pokemon.name,
-            url: details.sprites.front_default,
-            types: details.types.map((type) => type.type.name),
-          });
-        } catch (error) {
-          console.error("Error fetching pokemon details:", error);
-        }
-      }
-
-      return pokemons;
+      return json.results;
     } catch (error) {
       console.error("Error fetching posts:", error);
       return [];

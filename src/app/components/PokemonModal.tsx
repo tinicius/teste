@@ -2,6 +2,8 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { Pokemon } from "../entities";
 import { CardMedia, Typography } from "@mui/material";
+import { PokemonType } from "./PokemonType";
+import { useFetchPokemonDetails } from "../lib/useFetchPokemonDetails";
 
 const style = {
   position: "absolute",
@@ -22,6 +24,14 @@ export const PokemonModal = ({
   pokemon: Pokemon;
   onClose: () => void;
 }) => {
+  const { pokemonDetails, isLoading } = useFetchPokemonDetails({
+    url: pokemon.url,
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (!pokemonDetails) return <div>Error loading Pokémon details</div>;
+
   return (
     <Modal
       open
@@ -38,13 +48,23 @@ export const PokemonModal = ({
             sx={{
               objectFit: "contain",
             }}
-            image={pokemon.url}
-            alt={pokemon.name}
+            image={pokemonDetails.sprites.front_default}
+            alt={pokemonDetails.name}
           />
         </Box>
 
-        <Typography fontSize={32}>{pokemon.name}</Typography>
-        <Typography fontSize={16}>{`Nº ${pokemon.id}`}</Typography>
+        <Typography fontSize={32}>{pokemonDetails.name}</Typography>
+        <Typography fontSize={16}>{`Nº ${pokemonDetails.id}`}</Typography>
+
+        <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+          {pokemonDetails.types.map(({ type }) => (
+            <PokemonType key={type.name} type={type.name} />
+          ))}
+        </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "row", gap: "6px" }}>
+          <Typography fontWeight={600}>Peso:</Typography>
+        </Box>
       </Box>
     </Modal>
   );

@@ -62,8 +62,8 @@ export default function Home() {
           onSubmit={handleSubmitSearch}
         >
           <TextField
-            label="Search Pokémon"
-            placeholder="Type a name..."
+            label="Buscar Pokémon"
+            placeholder="Digite o nome..."
             variant="outlined"
             size="small"
             value={searchValue}
@@ -135,7 +135,7 @@ const PokemonGrid = ({
       >
         {pokemons.map((pokemon) => (
           <Grid
-            key={pokemon.id}
+            key={pokemon.name}
             size={{
               xs: 4,
               sm: 4,
