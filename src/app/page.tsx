@@ -11,7 +11,7 @@ import { PokemonModal } from "./components/PokemonModal";
 import { Pokemon } from "./entities";
 
 export default function Home() {
-  const { loadMore, fetchPokemonsByName, pokemons, isLoading } =
+  const { loadMore, fetchPokemonsByName, pokemons, isLoading, isLoadingMore } =
     useFetchPokemons();
 
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
@@ -97,11 +97,19 @@ export default function Home() {
           ))}
         </Grid>
       ) : (
-        <PokemonGrid
-          pokemons={pokemons}
-          onClick={handleSelectPokemon}
-          onLoadMore={() => loadMore(searchValue)}
-        />
+        <>
+          <PokemonGrid pokemons={pokemons} onClick={handleSelectPokemon} />
+
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+            <Button
+              variant="outlined"
+              disabled={isLoadingMore}
+              onClick={() => loadMore(searchValue)}
+            >
+              {isLoadingMore ? "Loading..." : "Load More"}
+            </Button>
+          </Box>
+        </>
       )}
     </Box>
   );
@@ -110,11 +118,9 @@ export default function Home() {
 const PokemonGrid = ({
   pokemons,
   onClick,
-  onLoadMore,
 }: {
   pokemons: Pokemon[];
   onClick: (pokemon: Pokemon) => void;
-  onLoadMore: () => void;
 }) => {
   return (
     <>
@@ -140,12 +146,6 @@ const PokemonGrid = ({
           </Grid>
         ))}
       </Grid>
-
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-        <Button variant="outlined" onClick={onLoadMore}>
-          Carregar mais
-        </Button>
-      </Box>
     </>
   );
 };
