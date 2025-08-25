@@ -16,6 +16,7 @@ import LastPageIcon from "@mui/icons-material/LastPage";
 import { useFetchPokemons } from "@/app/lib/useFetchPokemons";
 import { TableHead } from "@mui/material";
 import { Pokemon } from "@/app/entities";
+import { useEffect } from "react";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -108,11 +109,16 @@ export default function CustomPaginationActionsTable({
   const [limit, setLimit] = React.useState(5);
   const [offset, setOffset] = React.useState(0);
 
-  const { pokemons, count } = useFetchPokemons({
+  const { isLoading, pokemons, count } = useFetchPokemons({
     offset,
     limit,
     search,
   });
+
+  useEffect(() => {
+    setPage(0);
+    setOffset(0);
+  }, [search]);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -137,7 +143,15 @@ export default function CustomPaginationActionsTable({
         }}
       >
         <Table sx={{ minWidth: 500 }} stickyHeader aria-label="sticky table">
-          <TableHead>
+          <TableHead
+            sx={{
+              "& .MuiTableCell-head": {
+                backgroundColor: "gray",
+                color: "primary.contrastText",
+                fontWeight: 600,
+              },
+            }}
+          >
             <TableRow>
               <TableCell>#</TableCell>
               <TableCell>Nome</TableCell>
@@ -145,17 +159,49 @@ export default function CustomPaginationActionsTable({
           </TableHead>
 
           <TableBody>
-            {pokemons.map((row, index) => (
-              <TableRow key={row.name} onClick={() => onSelect(row)}>
-                <TableCell component="td" scope="row">
-                  {index + 1 + offset}
-                </TableCell>
-
-                <TableCell component="td" scope="row">
-                  {row.name}
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={2}>
+                  <div className="flex items-center justify-center p-5">
+                    <p>Carregando dados...</p>
+                  </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              <>
+                {pokemons.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={2}>
+                      <div className="flex items-center justify-center p-5">
+                        <p>Nenhum dado encontrado!</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {pokemons.length > 0 &&
+                  pokemons.map((row, index) => (
+                    <TableRow
+                      key={row.name}
+                      sx={{
+                        cursor: "pointer",
+                        "&:hover": {
+                          backgroundColor: "rgba(0,0,0,0.04)",
+                        },
+                      }}
+                      onClick={() => onSelect(row)}
+                    >
+                      <TableCell component="td" scope="row">
+                        {index + 1 + offset}
+                      </TableCell>
+
+                      <TableCell component="td" scope="row">
+                        {row.name}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -169,6 +215,10 @@ export default function CustomPaginationActionsTable({
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         ActionsComponent={TablePaginationActions}
+        labelRowsPerPage="Linhas por página"
+        labelDisplayedRows={({ from, to, count }) => {
+          return `${from}-${to} de ${count}`;
+        }}
       />
     </Paper>
   );
