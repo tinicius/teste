@@ -4,6 +4,7 @@ import { PokemonType } from "./PokemonType";
 import { useFetchPokemonDetails } from "../lib/useFetchPokemonDetails";
 import { PokemonGender } from "./PokemonGender";
 import { PokemonImages } from "./PokemonImages";
+import { Skeleton } from "@mui/material";
 
 export const PokemonModal = ({
   onClose,
@@ -26,7 +27,38 @@ const Content = ({ pokemon }: { pokemon: Pokemon }) => {
     url: pokemon.url,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row items-center justify-center">
+          <div className="w-32 h-32">
+            <Skeleton variant="rounded" height="100%" width="100%" />
+          </div>
+        </div>
+
+        <div className="flex flex-col">
+          <Skeleton variant="text" width={100} height={40} />
+          <Skeleton variant="text" width={50} />
+        </div>
+
+        <div className="flex flex-row gap-2">
+          <Skeleton variant="rounded" height={20} width={100} />
+          <Skeleton variant="rounded" height={20} width={100} />
+        </div>
+
+        <div className="flex flex-row gap-4">
+          <div className="flex-1 flex-col">
+            <Skeleton variant="text" width={50} />
+            <Skeleton variant="rounded" height={34} />
+          </div>
+
+          <div className="flex-1 flex-col">
+            <Skeleton variant="text" width={50} />
+            <Skeleton variant="rounded" height={34} />
+          </div>
+        </div>
+      </div>
+    );
 
   if (!pokemonDetails) return <div>Error loading Pokémon details</div>;
 

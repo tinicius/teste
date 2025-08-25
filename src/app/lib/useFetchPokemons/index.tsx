@@ -2,6 +2,9 @@ import { Pokemon } from "@/app/entities";
 import { PokemonResponse } from "./entities";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const FETCH_LIMIT = 10;
+const FETCH_ALL_LIMIT = 10000;
+
 export const useFetchPokemons = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,10 +21,8 @@ export const useFetchPokemons = () => {
   const getPokemonsByName = useCallback(
     async (name: string): Promise<Pokemon[]> => {
       try {
-        const maxLimit = 10000;
-
         const res = await fetch(
-          `https://pokeapi.co/api/v2/pokemon?offset=${nameOffset.current}&limit=${maxLimit}`
+          `https://pokeapi.co/api/v2/pokemon?offset=${nameOffset.current}&limit=${FETCH_ALL_LIMIT}`
         );
 
         const json = (await res.json()) as PokemonResponse;
@@ -39,7 +40,7 @@ export const useFetchPokemons = () => {
           try {
             pokemons.push(pokemon);
 
-            if (pokemons.length >= 10) {
+            if (pokemons.length >= FETCH_LIMIT) {
               countResult = index + 1;
               break;
             }
@@ -51,7 +52,7 @@ export const useFetchPokemons = () => {
         if (countResult !== 0) {
           nameOffset.current += countResult;
         } else {
-          nameOffset.current = 10000;
+          nameOffset.current = FETCH_ALL_LIMIT;
         }
 
         return pokemons;
@@ -86,6 +87,11 @@ export const useFetchPokemons = () => {
       setIsLimitReached(false);
 
       const pokemons = await getPokemonsByName(name);
+
+      if (pokemons.length < FETCH_LIMIT) {
+        setIsLimitReached(true);
+      }
+
       setIsLoading(false);
       setPokemons(pokemons);
     },
@@ -99,7 +105,7 @@ export const useFetchPokemons = () => {
       if (search.length) {
         const pokemons = await getPokemonsByName(search);
 
-        if (pokemons.length < 10) {
+        if (pokemons.length < FETCH_LIMIT) {
           setIsLimitReached(true);
         }
 
