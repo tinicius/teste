@@ -1,11 +1,14 @@
 import { useCallback, useState } from "react";
+import { getPokemonTypeColor, PokemonType } from "../entities/PokemonType";
 
 export const PokemonImages = ({
   images,
   name,
+  type,
 }: {
   images: string[];
   name: string;
+  type: PokemonType;
 }) => {
   const [imageIndex, setImageIndex] = useState(0);
 
@@ -22,7 +25,12 @@ export const PokemonImages = ({
   }, [images.length]);
 
   return (
-    <div className="flex flex-row justify-center items-center gap-4">
+    <div
+      className={`flex flex-row justify-center items-center gap-4 rounded-lg`}
+      style={{
+        backgroundColor: getPokemonTypeColor(type),
+      }}
+    >
       <p onClick={handlePreviousImage}>{"<"}</p>
 
       {/* eslint-disable-next-line @next/next/no-img-element */}

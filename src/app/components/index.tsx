@@ -1,7 +1,6 @@
 import { PokemonCard } from "./PokemonCard";
-import { PokemonGender } from "./PokemonGender";
 import { PokemonImages } from "./PokemonImages";
 import { PokemonModal } from "./PokemonModal";
-import { PokemonType } from "./PokemonType";
+import { PokemonTypeCard } from "./PokemonTypeCard";
 
-export { PokemonCard, PokemonImages, PokemonGender, PokemonModal, PokemonType };
+export { PokemonCard, PokemonImages, PokemonModal, PokemonTypeCard };
