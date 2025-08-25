@@ -1,9 +1,9 @@
 import Modal from "@mui/material/Modal";
-
 import { Pokemon } from "../entities";
 import { PokemonType } from "./PokemonType";
 import { useFetchPokemonDetails } from "../lib/useFetchPokemonDetails";
 import { PokemonGender } from "./PokemonGender";
+import { PokemonImages } from "./PokemonImages";
 
 export const PokemonModal = ({
   onClose,
@@ -32,11 +32,12 @@ const Content = ({ pokemon }: { pokemon: Pokemon }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <img
-        className="w-32 h-32 mx-auto"
-        src={pokemonDetails.sprites.front_default}
-        alt={pokemonDetails.name}
-      />
+      {pokemonDetails.images.length > 0 && (
+        <PokemonImages
+          images={pokemonDetails.images}
+          name={pokemonDetails.name}
+        />
+      )}
 
       <div className="flex flex-col">
         <p className="text-4xl">{pokemonDetails.name}</p>
@@ -44,8 +45,8 @@ const Content = ({ pokemon }: { pokemon: Pokemon }) => {
       </div>
 
       <div className="flex flex-row gap-2">
-        {pokemonDetails.types.map(({ type }) => (
-          <PokemonType key={type.name} type={type.name} />
+        {pokemonDetails.types.map((type) => (
+          <PokemonType key={type} type={type} />
         ))}
       </div>
 
@@ -75,7 +76,6 @@ const Content = ({ pokemon }: { pokemon: Pokemon }) => {
       </div>
 
       <PokemonGender speciesUrl={pokemonDetails.species.url} />
-
     </div>
   );
 };
