@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useFetchPokemons = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const [isLimitReached, setIsLimitReached] = useState(false);
 
   const offset = useRef(0);
   const limit = useRef(20);
@@ -79,7 +81,10 @@ export const useFetchPokemons = () => {
   const fetchPokemonsByName = useCallback(
     async (name: string): Promise<void> => {
       setIsLoading(true);
+
       nameOffset.current = 0;
+      setIsLimitReached(false);
+
       const pokemons = await getPokemonsByName(name);
       setIsLoading(false);
       setPokemons(pokemons);
@@ -93,7 +98,13 @@ export const useFetchPokemons = () => {
 
       if (search.length) {
         const pokemons = await getPokemonsByName(search);
-        setPokemons((prev) => [...prev, ...pokemons]);
+
+        if (pokemons.length < 10) {
+          setIsLimitReached(true);
+        }
+
+        if (pokemons.length) setPokemons((prev) => [...prev, ...pokemons]);
+
         setIsLoadingMore(false);
         return;
       }
@@ -109,8 +120,8 @@ export const useFetchPokemons = () => {
 
   useEffect(() => {
     const loadInitial = async () => {
-      setIsLoading(true);
       const pokemons = await getPokemons();
+
       setPokemons(pokemons);
       setIsLoading(false);
     };
@@ -118,5 +129,12 @@ export const useFetchPokemons = () => {
     loadInitial();
   }, [getPokemons]);
 
-  return { loadMore, fetchPokemonsByName, pokemons, isLoading, isLoadingMore };
+  return {
+    loadMore,
+    fetchPokemonsByName,
+    pokemons,
+    isLoading,
+    isLoadingMore,
+    isLimitReached,
+  };
 };

@@ -1,9 +1,6 @@
 "use client";
 
-import { Box, Button, Skeleton, TextField } from "@mui/material";
-
-import Grid from "@mui/material/Grid";
-
+import { Button, Skeleton, TextField } from "@mui/material";
 import { useFetchPokemons } from "./lib/useFetchPokemons";
 import { PokemonCard } from "./components/PokemonCard";
 import { useCallback, useState } from "react";
@@ -11,12 +8,21 @@ import { PokemonModal } from "./components/PokemonModal";
 import { Pokemon } from "./entities";
 
 export default function Home() {
-  const { loadMore, fetchPokemonsByName, pokemons, isLoading, isLoadingMore } =
-    useFetchPokemons();
+  const {
+    loadMore,
+    fetchPokemonsByName,
+    pokemons,
+    isLoading,
+    isLoadingMore,
+    isLimitReached,
+  } = useFetchPokemons();
 
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 
   const [searchValue, setSearchValue] = useState("");
+
+  const isLoadMoreDisabled =
+    isLoadingMore || isLoading || isLimitReached || pokemons.length === 0;
 
   const handleSelectPokemon = useCallback((pokemon: Pokemon) => {
     setSelectedPokemon(pokemon);
@@ -36,31 +42,13 @@ export default function Home() {
   );
 
   return (
-    <Box
-      flexGrow={1}
-      bgcolor={"white"}
-      padding={2}
-      gap={2}
-      display="flex"
-      flexDirection="column"
-    >
+    <div className="flex-1 min-h-screen ">
       {selectedPokemon && (
         <PokemonModal pokemon={selectedPokemon} onClose={handleCloseModal} />
       )}
 
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "end",
-        }}
-      >
-        <form
-          style={{
-            width: "100%",
-          }}
-          onSubmit={handleSubmitSearch}
-        >
+      <div className="p-3">
+        <form onSubmit={handleSubmitSearch}>
           <TextField
             label="Buscar Pokémon"
             placeholder="Digite o nome..."
@@ -71,81 +59,49 @@ export default function Home() {
             fullWidth
           />
         </form>
-      </Box>
+      </div>
 
-      {isLoading ? (
-        <Grid
-          container
-          spacing={2}
-          columns={{
-            xs: 4,
-            sm: 8,
-            md: 16,
-          }}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3">
+        {isLoading ? (
+          <>
+            {Array.from({ length: 20 }).map((_, index) => (
+              <Skeleton
+                key={index}
+                variant="rounded"
+                width="100%"
+                height={55.5}
+              />
+            ))}
+          </>
+        ) : (
+          <>
+            {pokemons.length > 0 &&
+              pokemons.map((pokemon) => (
+                <PokemonCard
+                  key={pokemon.name}
+                  pokemon={pokemon}
+                  onClick={() => handleSelectPokemon(pokemon)}
+                />
+              ))}
+
+            {pokemons.length === 0 && (
+              <div className="col-span-full text-center text-black">
+                <p>Nenhum Pokémon encontrado.</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <div className="flex justify-center mb-3">
+        <Button
+          variant="outlined"
+          disabled={isLoadMoreDisabled}
+          onClick={() => loadMore(searchValue)}
         >
-          {Array.from({ length: 10 }).map((_, index) => (
-            <Grid
-              key={index}
-              size={{
-                xs: 4,
-                sm: 4,
-                md: 4,
-              }}
-            >
-              <Skeleton variant="rounded" width="100%" height={100} />
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <>
-          <PokemonGrid pokemons={pokemons} onClick={handleSelectPokemon} />
-
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-            <Button
-              variant="outlined"
-              disabled={isLoadingMore}
-              onClick={() => loadMore(searchValue)}
-            >
-              {isLoadingMore ? "Loading..." : "Load More"}
-            </Button>
-          </Box>
-        </>
-      )}
-    </Box>
+          {isLoadingMore ? "Loading..." : "Load More"}
+        </Button>
+      </div>
+    </div>
   );
 }
-
-const PokemonGrid = ({
-  pokemons,
-  onClick,
-}: {
-  pokemons: Pokemon[];
-  onClick: (pokemon: Pokemon) => void;
-}) => {
-  return (
-    <>
-      <Grid
-        container
-        spacing={2}
-        columns={{
-          xs: 4,
-          sm: 8,
-          md: 16,
-        }}
-      >
-        {pokemons.map((pokemon) => (
-          <Grid
-            key={pokemon.name}
-            size={{
-              xs: 4,
-              sm: 4,
-              md: 4,
-            }}
-          >
-            <PokemonCard pokemon={pokemon} onClick={() => onClick(pokemon)} />
-          </Grid>
-        ))}
-      </Grid>
-    </>
-  );
-};
