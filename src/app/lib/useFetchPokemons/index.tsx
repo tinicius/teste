@@ -2,7 +2,7 @@ import { Pokemon } from "@/app/entities";
 import { PokemonResponse } from "./entities";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const FETCH_LIMIT = 10;
+const FETCH_LIMIT = 20;
 const FETCH_ALL_LIMIT = 10000;
 
 export const useFetchPokemons = () => {
