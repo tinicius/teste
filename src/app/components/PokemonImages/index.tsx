@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { getPokemonTypeColor, PokemonType } from "../entities/PokemonType";
+import { getPokemonTypeColor, PokemonType } from "../../entities/PokemonType";
 
 export const PokemonImages = ({
   images,

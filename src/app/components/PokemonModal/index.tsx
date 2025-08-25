@@ -1,9 +1,9 @@
 import Modal from "@mui/material/Modal";
-import { Pokemon } from "../entities";
-import { useFetchPokemonDetails } from "../lib/useFetchPokemonDetails";
-import { PokemonImages } from "./PokemonImages";
+import { Pokemon } from "../../entities";
+import { useFetchPokemonDetails } from "../../lib/useFetchPokemonDetails";
+import { PokemonImages } from "../PokemonImages";
 import { Skeleton } from "@mui/material";
-import { PokemonTypeCard } from "./PokemonTypeCard";
+import { PokemonTypeCard } from "../PokemonTypeCard";
 
 export const PokemonModal = ({
   onClose,

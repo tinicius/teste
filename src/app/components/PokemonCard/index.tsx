@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import { Pokemon } from "../entities";
+import { Pokemon } from "../../entities";
 import Typography from "@mui/material/Typography";
 
 export const PokemonCard = ({

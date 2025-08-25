@@ -1,5 +1,8 @@
-import { PokemonType } from "../entities";
-import { getPokemonTypeColor, getPokemonTypePT } from "../entities/PokemonType";
+import { PokemonType } from "../../entities";
+import {
+  getPokemonTypeColor,
+  getPokemonTypePT,
+} from "../../entities/PokemonType";
 import Card from "@mui/material/Card";
 
 export const PokemonTypeCard = ({ type }: { type: PokemonType }) => {
