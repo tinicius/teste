@@ -1,6 +1,7 @@
 import { PokemonDetails } from "@/app/entities/PokemonDetails";
 import { useEffect, useState } from "react";
 import { PokemonDetailsResponse } from "./entities";
+import { PokemonType } from "@/app/entities";
 
 export const useFetchPokemonDetails = ({ url }: { url: string }) => {
   const [pokemonDetails, setPokemonDetails] = useState<PokemonDetails | null>(
@@ -26,7 +27,7 @@ export const useFetchPokemonDetails = ({ url }: { url: string }) => {
           data.sprites.back_shiny_female,
         ].filter((img): img is string => !!img);
 
-        const types = data.types.map((t) => t.type.name);
+        const types = data.types.map((t) => t.type.name) as PokemonType[];
 
         setPokemonDetails({
           id: data.id,
