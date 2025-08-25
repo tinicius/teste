@@ -2,19 +2,21 @@ import { Pokemon } from "@/app/entities";
 import { PokemonResponse } from "./entities";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const FETCH_LIMIT = 20;
 const FETCH_ALL_LIMIT = 10000;
 
-export const useFetchPokemons = () => {
+export const useFetchPokemons = ({
+  offset,
+  limit,
+  search,
+}: {
+  offset: number;
+  limit: number;
+  search: string;
+}) => {
+  const [count, setCount] = useState(0);
+
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-  const [isLimitReached, setIsLimitReached] = useState(false);
-
-  const offset = useRef(0);
-  const limit = useRef(20);
 
   const nameOffset = useRef(0);
 
@@ -29,8 +31,6 @@ export const useFetchPokemons = () => {
 
         const pokemons: Pokemon[] = [];
 
-        let countResult = 0;
-
         for (let index = 0; index < json.results.length; index++) {
           const pokemon = json.results[index];
 
@@ -39,20 +39,9 @@ export const useFetchPokemons = () => {
 
           try {
             pokemons.push(pokemon);
-
-            if (pokemons.length >= FETCH_LIMIT) {
-              countResult = index + 1;
-              break;
-            }
           } catch (error) {
             console.error("Error fetching pokemon details:", error);
           }
-        }
-
-        if (countResult !== 0) {
-          nameOffset.current += countResult;
-        } else {
-          nameOffset.current = FETCH_ALL_LIMIT;
         }
 
         return pokemons;
@@ -67,65 +56,35 @@ export const useFetchPokemons = () => {
   const getPokemons = useCallback(async (): Promise<Pokemon[]> => {
     try {
       const res = await fetch(
-        `https://pokeapi.co/api/v2/pokemon?offset=${offset.current}&limit=${limit.current}`
+        `https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`
       );
 
       const json = (await res.json()) as PokemonResponse;
+
+      setCount(json.count);
 
       return json.results;
     } catch (error) {
       console.error("Error fetching posts:", error);
       return [];
     }
-  }, []);
-
-  const fetchPokemonsByName = useCallback(
-    async (name: string): Promise<void> => {
-      setIsLoading(true);
-
-      nameOffset.current = 0;
-      setIsLimitReached(false);
-
-      const pokemons = await getPokemonsByName(name);
-
-      if (pokemons.length < FETCH_LIMIT) {
-        setIsLimitReached(true);
-      }
-
-      setIsLoading(false);
-      setPokemons(pokemons);
-    },
-    [getPokemonsByName]
-  );
-
-  const loadMore = useCallback(
-    async (search: string) => {
-      setIsLoadingMore(true);
-
-      if (search.length) {
-        const pokemons = await getPokemonsByName(search);
-
-        if (pokemons.length < FETCH_LIMIT) {
-          setIsLimitReached(true);
-        }
-
-        if (pokemons.length) setPokemons((prev) => [...prev, ...pokemons]);
-
-        setIsLoadingMore(false);
-        return;
-      }
-
-      offset.current += limit.current;
-      const pokemons = await getPokemons();
-
-      setPokemons((prev) => [...prev, ...pokemons]);
-      setIsLoadingMore(false);
-    },
-    [getPokemons, getPokemonsByName]
-  );
+  }, [limit, offset]);
 
   useEffect(() => {
     const loadInitial = async () => {
+      setIsLoading(true);
+
+      if (search.length > 0) {
+        const pokemons = await getPokemonsByName(search);
+
+        setCount(pokemons.length);
+
+        setPokemons(pokemons.slice(offset, offset + limit));
+        setIsLoading(false);
+
+        return;
+      }
+
       const pokemons = await getPokemons();
 
       setPokemons(pokemons);
@@ -133,14 +92,11 @@ export const useFetchPokemons = () => {
     };
 
     loadInitial();
-  }, [getPokemons]);
+  }, [getPokemons, getPokemonsByName, limit, offset, search]);
 
   return {
-    loadMore,
-    fetchPokemonsByName,
-    pokemons,
     isLoading,
-    isLoadingMore,
-    isLimitReached,
+    pokemons,
+    count,
   };
 };
